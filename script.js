@@ -1,3 +1,5 @@
+// script.js
+
 const days = [
   "Monday",
   "Tuesday",
@@ -17,88 +19,50 @@ for (let i = 8; i <= 23; i++) {
   );
 }
 
-const daysContainer =
-  document.getElementById("daysContainer");
-
-days.forEach(day => {
-
-  daysContainer.innerHTML += `
-
-    <div class="day-card">
-
-      <h3>${day}</h3>
-
-      <div class="input-group">
-        <label>Lecture Start</label>
-        <input type="time" id="${day}-start">
-      </div>
-
-      <div class="input-group">
-        <label>Lecture End</label>
-        <input type="time" id="${day}-end">
-      </div>
-
-      <div class="input-group">
-        <label>Event / Plan</label>
-        <input
-          type="text"
-          id="${day}-event"
-          placeholder="Dinner, Society, HAIP..."
-        >
-      </div>
-
-      <div class="checkbox">
-        <input type="checkbox" id="${day}-busy">
-        <label>Busy Evening</label>
-      </div>
-
-    </div>
-  `;
-});
-
 document
 .getElementById("generateBtn")
 .addEventListener("click", generateWeek);
 
 function generateWeek() {
 
-  const examMode =
-    document.getElementById("examMode").checked;
+  const weekly = {};
 
   let meals = 0;
   let snacks = 0;
-  let gymCount = 0;
+  let gym = 0;
 
-  let prepDay = "Wednesday";
+  const examMode =
+    document.getElementById("examMode").checked;
 
   const warningBox =
     document.getElementById("warningBox");
 
   warningBox.classList.add("hidden");
 
-  const weekly = {};
-
   days.forEach(day => {
 
     weekly[day] = {};
 
     times.forEach(time => {
+
       weekly[day][time] =
-        createBlock("Free", "free");
+        block("Free", "free");
     });
+
+    // SATURDAY
 
     if (day === "Saturday") {
 
-      addBlock(weekly, day, 9, 15, "Study", "study");
+      add(weekly, day, 9, 15, "Study", "study");
 
       if (!examMode) {
 
-        addBlock(weekly, day, 16, 18, "Gym", "gym");
+        add(weekly, day, 16, 18, "Gym", "gym");
 
-        gymCount++;
+        gym++;
       }
 
-      addBlock(
+      add(
         weekly,
         day,
         19,
@@ -107,15 +71,17 @@ function generateWeek() {
         "free"
       );
 
-      meals += 1;
-      snacks += 1;
+      meals++;
+      snacks++;
 
       return;
     }
 
+    // SUNDAY
+
     if (day === "Sunday") {
 
-      addBlock(
+      add(
         weekly,
         day,
         10,
@@ -124,7 +90,7 @@ function generateWeek() {
         "meal"
       );
 
-      addBlock(
+      add(
         weekly,
         day,
         14,
@@ -133,7 +99,7 @@ function generateWeek() {
         "free"
       );
 
-      addBlock(
+      add(
         weekly,
         day,
         16,
@@ -142,8 +108,8 @@ function generateWeek() {
         "study"
       );
 
-      meals += 1;
-      snacks += 1;
+      meals++;
+      snacks++;
 
       return;
     }
@@ -160,9 +126,11 @@ function generateWeek() {
     const busy =
       document.getElementById(`${day}-busy`).checked;
 
+    // NO LECTURES
+
     if (!start || !end) {
 
-      addBlock(
+      add(
         weekly,
         day,
         10,
@@ -171,20 +139,33 @@ function generateWeek() {
         "study"
       );
 
-      addBlock(
-        weekly,
-        day,
-        16,
-        18,
-        examMode ? "Study" : "Gym",
-        examMode ? "study" : "gym"
-      );
+      if (examMode) {
 
-      if (!examMode) {
-        gymCount++;
+        add(
+          weekly,
+          day,
+          16,
+          18,
+          "Extra Study",
+          "study"
+        );
       }
 
-      return;
+      else {
+
+        add(
+          weekly,
+          day,
+          16,
+          18,
+          "Gym",
+          "gym"
+        );
+
+        gym++;
+      }
+
+      continue;
     }
 
     const startHour =
@@ -193,7 +174,7 @@ function generateWeek() {
     const endHour =
       parseInt(end.split(":")[0]);
 
-    addBlock(
+    add(
       weekly,
       day,
       startHour,
@@ -203,17 +184,20 @@ function generateWeek() {
     );
 
     const fullDay =
-      startHour < 10 && endHour >= 16;
+      startHour < 10 &&
+      endHour >= 16;
 
     const earlyDay =
       endHour <= 13;
+
+    // FULL DAY
 
     if (fullDay) {
 
       meals += 1;
       snacks += 2;
 
-      addBlock(
+      add(
         weekly,
         day,
         18,
@@ -222,7 +206,7 @@ function generateWeek() {
         "meal"
       );
 
-      addBlock(
+      add(
         weekly,
         day,
         20,
@@ -232,28 +216,16 @@ function generateWeek() {
       );
     }
 
+    // EARLY DAY
+
     else if (earlyDay) {
 
       meals += 1;
       snacks += 1;
 
-      if (!busy && !examMode) {
+      if (examMode || busy) {
 
-        addBlock(
-          weekly,
-          day,
-          16,
-          18,
-          "Gym",
-          "gym"
-        );
-
-        gymCount++;
-      }
-
-      else {
-
-        addBlock(
+        add(
           weekly,
           day,
           16,
@@ -263,7 +235,21 @@ function generateWeek() {
         );
       }
 
-      addBlock(
+      else {
+
+        add(
+          weekly,
+          day,
+          16,
+          18,
+          "Gym",
+          "gym"
+        );
+
+        gym++;
+      }
+
+      add(
         weekly,
         day,
         19,
@@ -273,12 +259,14 @@ function generateWeek() {
       );
     }
 
+    // LATE DAY
+
     else {
 
       meals += 2;
       snacks += 1;
 
-      addBlock(
+      add(
         weekly,
         day,
         18,
@@ -289,7 +277,7 @@ function generateWeek() {
 
       if (!examMode) {
 
-        addBlock(
+        add(
           weekly,
           day,
           20,
@@ -298,13 +286,15 @@ function generateWeek() {
           "gym"
         );
 
-        gymCount++;
+        gym++;
       }
     }
 
+    // EVENTS
+
     if (event) {
 
-      addBlock(
+      add(
         weekly,
         day,
         21,
@@ -314,6 +304,10 @@ function generateWeek() {
       );
     }
   });
+
+  // MEAL PREP LOGIC
+
+  let prepDay = "Wednesday";
 
   const wedBusy =
     document.getElementById("Wednesday-busy").checked;
@@ -342,7 +336,7 @@ function generateWeek() {
 
       document.getElementById("warningText")
       .textContent =
-        "No available meal prep day exists.";
+        "No available meal prep day.";
     }
   }
 
@@ -353,15 +347,15 @@ function generateWeek() {
     .textContent = snacks;
 
   document.getElementById("gymCount")
-    .textContent = gymCount;
+    .textContent = gym;
 
   document.getElementById("prepDay")
     .textContent = prepDay;
 
-  renderCalendar(weekly);
+  render(weekly);
 }
 
-function addBlock(
+function add(
   weekly,
   day,
   start,
@@ -376,11 +370,11 @@ function addBlock(
       `${String(i).padStart(2,"0")}:00`;
 
     weekly[day][time] =
-      createBlock(text, type);
+      block(text, type);
   }
 }
 
-function createBlock(text, type) {
+function block(text, type) {
 
   return `
     <div class="block ${type}">
@@ -389,7 +383,7 @@ function createBlock(text, type) {
   `;
 }
 
-function renderCalendar(weekly) {
+function render(weekly) {
 
   const body =
     document.getElementById("calendarBody");
