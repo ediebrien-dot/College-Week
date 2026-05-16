@@ -8,7 +8,7 @@ for (let h = 8; h <= 23; h++) {
   TIMES.push(`${String(h).padStart(2, "0")}:00`);
 }
 
-// ─── BUILD DAY CARDS ──────────────────────────────────────────
+// ─── BUILD DAY CARDS (no busy checkbox) ───────────────────────
 function buildDayCards() {
   const container = document.querySelector(".days-container");
   container.innerHTML = "";
@@ -18,10 +18,6 @@ function buildDayCards() {
       <div class="day-card">
         <div class="day-card-header">
           <h3>${day}</h3>
-          <label class="busy-label">
-            <input type="checkbox" id="${day}-busy">
-            Something Scheduled
-          </label>
         </div>
         <div class="time-row">
           <div class="input-group">
@@ -63,7 +59,7 @@ function makeBlock(text, type) {
 function fillSlots(schedule, day, startHour, endHour, text, type) {
   for (let h = startHour; h < endHour; h++) {
     const key = `${String(h).padStart(2, "0")}:00`;
-    if (schedule[day][key] !== undefined) {
+    if (schedule[day] && schedule[day][key] !== undefined) {
       schedule[day][key] = makeBlock(text, type);
     }
   }
@@ -90,111 +86,117 @@ function generateWeek() {
     TIMES.forEach(t => { schedule[day][t] = makeBlock("", "free"); });
   });
 
+  // meals/snacks = only food you need to BRING to college
   let meals = 0, snacks = 0, gym = 0;
 
   // ── SATURDAY ──
-  fillSlots(schedule, "Saturday", 9,  15, "Study",          "study");
-  fillSlots(schedule, "Saturday", 19, 21, "Business / Admin","free");
+  fillSlots(schedule, "Saturday", 9,  15, "Study", "study");
   if (!examMode) {
     fillSlots(schedule, "Saturday", 16, 18, "Gym", "gym");
     gym++;
   } else {
     fillSlots(schedule, "Saturday", 16, 18, "Study", "study");
   }
-  meals++; snacks++;
+  fillSlots(schedule, "Saturday", 19, 20, "Dinner", "meal");
+  fillSlots(schedule, "Saturday", 20, 22, "Business / Admin", "free");
 
   // ── SUNDAY ──
   fillSlots(schedule, "Sunday", 10, 13, "Meal Prep",     "meal");
   fillSlots(schedule, "Sunday", 14, 15, "Long Walk",     "free");
   fillSlots(schedule, "Sunday", 16, 18, "Reset + Clean", "study");
-  meals++; snacks++;
+  fillSlots(schedule, "Sunday", 19, 20, "Dinner",        "meal");
 
-  // ── WEEKDAYS ──
+  // ── COLLECT WEEKDAY DATA FIRST (needed for prep day logic) ──
+  const dayData = {};
   WEEKDAYS.forEach(day => {
     const startRaw = getVal(`${day}-start`);
     const endRaw   = getVal(`${day}-end`);
     const event    = getVal(`${day}-event`);
-    const busy     = getChecked(`${day}-busy`);
 
-    // No lectures today
-    if (!startRaw || !endRaw) {
-      fillSlots(schedule, day, 10, 13, "Deep Study", "study");
-      if (examMode) {
-        fillSlots(schedule, day, 16, 18, "Extra Study", "study");
-      } else {
-        fillSlots(schedule, day, 16, 18, "Gym", "gym");
-        gym++;
-      }
-      if (event) {
-        fillSlots(schedule, day, 19, 21, event, "social");
-      }
-      meals += 1; snacks += 1;
-      return; // forEach return = continue
-    }
+    const hasLectures = startRaw && endRaw;
+    const startHour   = hasLectures ? Math.floor(parseFloat(startRaw)) : null;
+    const endHour     = hasLectures ? Math.ceil(parseFloat(endRaw))    : null;
+    const lectureHours = hasLectures ? (endHour - startHour) : 0;
 
-    const startHour = parseInt(startRaw.split(":")[0], 10);
-    const endHour   = parseInt(endRaw.split(":")[0],   10);
+    // "Busy evening" = event is scheduled OR lectures run past 17:00
+    const busyEvening = !!event || (hasLectures && endHour >= 17);
 
-    // Clamp to timetable range
-    const sH = Math.max(8,  startHour);
-    const eH = Math.min(23, endHour);
-
-    fillSlots(schedule, day, sH, eH, "College", "lecture");
-
-    const isFullDay  = startHour < 10 && endHour >= 16;
-    const isEarlyDay = endHour <= 13;
-
-    if (isFullDay) {
-      // Full day of college
-      fillSlots(schedule, day, 18, 19, "Dinner", "meal");
-      fillSlots(schedule, day, 20, 22, "Study",  "study");
-      meals += 1; snacks += 2;
-
-    } else if (isEarlyDay) {
-      // Done before 1 PM — afternoon free
-      if (examMode || busy) {
-        fillSlots(schedule, day, 16, 18, "Study", "study");
-      } else {
-        fillSlots(schedule, day, 16, 18, "Gym", "gym");
-        gym++;
-      }
-      fillSlots(schedule, day, 19, 21, "Study", "study");
-      meals += 1; snacks += 1;
-
-    } else {
-      // Mid/late day
-      fillSlots(schedule, day, 18, 20, "Study + Dinner", "study");
-      if (!examMode && !busy) {
-        fillSlots(schedule, day, 20, 21, "Gym", "gym");
-        gym++;
-      }
-      meals += 2; snacks += 1;
-    }
-
-    if (event) {
-      fillSlots(schedule, day, 21, 23, event, "social");
-    }
+    dayData[day] = { startRaw, endRaw, event, hasLectures, startHour, endHour, lectureHours, busyEvening };
   });
 
-  // ── MEAL PREP DAY ──
-  const wedBusy = getChecked("Wednesday-busy");
-  const thuBusy = getChecked("Thursday-busy");
-  const tueBusy = getChecked("Tuesday-busy");
+  // ── MEAL PREP DAY: pick least-busy weekday (fewest lecture hours) ──
+  // Prefer Wed → Thu → Tue → Mon → Fri, but among those pick lightest day
+  const prepCandidates = ["Wednesday", "Thursday", "Tuesday", "Monday", "Friday"];
+  // Sort by lecture hours ascending (0 = no lectures = best)
+  const sortedCandidates = [...prepCandidates].sort(
+    (a, b) => dayData[a].lectureHours - dayData[b].lectureHours
+  );
+  const prepDay = sortedCandidates[0];
 
-  let prepDay = "Wednesday";
   const warningBox = document.getElementById("warningBox");
   warningBox.classList.add("hidden");
 
-  if (wedBusy) {
-    if (!thuBusy)      { prepDay = "Thursday"; }
-    else if (!tueBusy) { prepDay = "Tuesday"; }
-    else {
-      prepDay = "N/A";
-      warningBox.classList.remove("hidden");
-      document.getElementById("warningText").textContent =
-        "All mid-week days are busy — no available meal prep slot found.";
+  // ── PROCESS EACH WEEKDAY ──
+  WEEKDAYS.forEach(day => {
+    const { hasLectures, startHour, endHour, event, busyEvening } = dayData[day];
+
+    // NO LECTURES
+    if (!hasLectures) {
+      fillSlots(schedule, day, 10, 13, "Deep Study", "study");
+      if (examMode) {
+        fillSlots(schedule, day, 14, 16, "Extra Study", "study");
+      } else if (!busyEvening) {
+        fillSlots(schedule, day, 16, 18, "Gym", "gym");
+        gym++;
+      }
+      fillSlots(schedule, day, 19, 20, "Dinner", "meal");
+      if (event) fillSlots(schedule, day, 20, 22, event, "social");
+      // No meals/snacks to bring — eating at home
+      return;
     }
-  }
+
+    // COLLEGE DAY — add lecture block
+    const sH = Math.max(8,  startHour);
+    const eH = Math.min(23, endHour);
+    fillSlots(schedule, day, sH, eH, "College", "lecture");
+
+    const isFullDay  = startHour <= 9 && endHour >= 17;   // e.g. 08:45–17:30
+    const isEarlyDay = endHour <= 13;                      // done by 10:30 or 12:30
+    const isMidDay   = !isFullDay && !isEarlyDay;          // 13:45 start or ends ~15:30
+
+    if (isFullDay) {
+      // Long day — bring lunch + snack, home for dinner
+      meals += 1; snacks += 1;
+      fillSlots(schedule, day, 19, 20, "Dinner", "meal");
+      fillSlots(schedule, day, 20, 22, "Study",  "study");
+
+    } else if (isEarlyDay) {
+      // Short day — back by 10:30 or 12:30, eat at home, nothing to bring
+      // (maybe a snack if leaving early)
+      snacks += 1;
+      if (!examMode && !busyEvening) {
+        fillSlots(schedule, day, 16, 18, "Gym", "gym");
+        gym++;
+      } else {
+        fillSlots(schedule, day, 16, 18, "Study", "study");
+      }
+      fillSlots(schedule, day, 19, 20, "Dinner", "meal");
+      if (event) fillSlots(schedule, day, 20, 22, event, "social");
+      else       fillSlots(schedule, day, 20, 22, "Study", "study");
+
+    } else {
+      // Mid day — bring lunch, home for dinner
+      meals += 1;
+      if (!examMode && !busyEvening) {
+        fillSlots(schedule, day, 18, 20, "Gym", "gym");
+        gym++;
+      } else {
+        fillSlots(schedule, day, 18, 20, "Study", "study");
+      }
+      fillSlots(schedule, day, 20, 21, "Dinner", "meal");
+      if (event) fillSlots(schedule, day, 21, 23, event, "social");
+    }
+  });
 
   // ── UPDATE STATS ──
   document.getElementById("mealCount").textContent  = meals;
@@ -212,8 +214,6 @@ function renderCalendar(schedule) {
 
   TIMES.forEach(time => {
     const tr = document.createElement("tr");
-
-    // Time cell
     const timeTd = document.createElement("td");
     timeTd.textContent = time;
     tr.appendChild(timeTd);
@@ -227,7 +227,6 @@ function renderCalendar(schedule) {
     body.appendChild(tr);
   });
 
-  // Show calendar, hide empty state
   document.getElementById("calendarWrapper").classList.remove("hidden");
   document.getElementById("emptyState").classList.add("hidden");
 }
