@@ -1,3 +1,6 @@
+
+<!-- index.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +9,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>College Week Planner</title>
+  <title>College Planner</title>
 
   <link rel="stylesheet" href="style.css">
 
@@ -25,7 +28,7 @@
       <h1>College Week</h1>
 
       <p class="subtitle">
-        Intelligent weekly planner
+        Smart automatic weekly planner
       </p>
 
       <div class="toggle-box">
@@ -71,25 +74,155 @@
       </div>
 
       <div class="warning hidden" id="warningBox">
+
         <strong>Warning</strong>
+
         <p id="warningText"></p>
+
       </div>
 
     </aside>
 
     <main class="main-content">
 
-      <section class="inputs-section">
+      <section>
 
         <div class="section-header">
           <h2>Weekly Inputs</h2>
         </div>
 
-        <div class="days-container" id="daysContainer"></div>
+        <div class="days-container">
+
+          <!-- MONDAY -->
+          <div class="day-card">
+            <h3>Monday</h3>
+
+            <div class="input-group">
+              <label>Lecture Start</label>
+              <input type="time" id="Monday-start">
+            </div>
+
+            <div class="input-group">
+              <label>Lecture End</label>
+              <input type="time" id="Monday-end">
+            </div>
+
+            <div class="input-group">
+              <label>Event / Plan</label>
+              <input type="text" id="Monday-event">
+            </div>
+
+            <div class="checkbox">
+              <input type="checkbox" id="Monday-busy">
+              <label>Busy Evening</label>
+            </div>
+          </div>
+
+          <!-- TUESDAY -->
+          <div class="day-card">
+            <h3>Tuesday</h3>
+
+            <div class="input-group">
+              <label>Lecture Start</label>
+              <input type="time" id="Tuesday-start">
+            </div>
+
+            <div class="input-group">
+              <label>Lecture End</label>
+              <input type="time" id="Tuesday-end">
+            </div>
+
+            <div class="input-group">
+              <label>Event / Plan</label>
+              <input type="text" id="Tuesday-event" placeholder="HAIP">
+            </div>
+
+            <div class="checkbox">
+              <input type="checkbox" id="Tuesday-busy">
+              <label>Busy Evening</label>
+            </div>
+          </div>
+
+          <!-- WEDNESDAY -->
+          <div class="day-card">
+            <h3>Wednesday</h3>
+
+            <div class="input-group">
+              <label>Lecture Start</label>
+              <input type="time" id="Wednesday-start">
+            </div>
+
+            <div class="input-group">
+              <label>Lecture End</label>
+              <input type="time" id="Wednesday-end">
+            </div>
+
+            <div class="input-group">
+              <label>Event / Plan</label>
+              <input type="text" id="Wednesday-event">
+            </div>
+
+            <div class="checkbox">
+              <input type="checkbox" id="Wednesday-busy">
+              <label>Busy Evening</label>
+            </div>
+          </div>
+
+          <!-- THURSDAY -->
+          <div class="day-card">
+            <h3>Thursday</h3>
+
+            <div class="input-group">
+              <label>Lecture Start</label>
+              <input type="time" id="Thursday-start">
+            </div>
+
+            <div class="input-group">
+              <label>Lecture End</label>
+              <input type="time" id="Thursday-end">
+            </div>
+
+            <div class="input-group">
+              <label>Event / Plan</label>
+              <input type="text" id="Thursday-event" placeholder="HAIP">
+            </div>
+
+            <div class="checkbox">
+              <input type="checkbox" id="Thursday-busy">
+              <label>Busy Evening</label>
+            </div>
+          </div>
+
+          <!-- FRIDAY -->
+          <div class="day-card">
+            <h3>Friday</h3>
+
+            <div class="input-group">
+              <label>Lecture Start</label>
+              <input type="time" id="Friday-start">
+            </div>
+
+            <div class="input-group">
+              <label>Lecture End</label>
+              <input type="time" id="Friday-end">
+            </div>
+
+            <div class="input-group">
+              <label>Event / Plan</label>
+              <input type="text" id="Friday-event">
+            </div>
+
+            <div class="checkbox">
+              <input type="checkbox" id="Friday-busy">
+              <label>Busy Evening</label>
+            </div>
+          </div>
+
+        </div>
 
       </section>
 
-      <section class="calendar-section">
+      <section>
 
         <div class="section-header">
           <h2>Generated Timetable</h2>
@@ -97,7 +230,7 @@
 
         <div class="calendar-wrapper">
 
-          <table id="calendar">
+          <table>
 
             <thead>
 
