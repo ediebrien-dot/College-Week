@@ -42,7 +42,7 @@ function buildDayCards() {
         </div>
         <div class="input-group">
           <label>Exam Name</label>
-          <input type="text" id="${day}-exam-name" placeholder="e.g. Biochemistry">
+          <input type="text" id="${day}-exam-name" placeholder="e.g. Structural Mechanics">
         </div>
       </div>
     ` : "";
