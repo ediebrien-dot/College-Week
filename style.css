@@ -526,3 +526,30 @@ td:first-child {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(200,81,10,0.12);
 }
+
+/* ─── EXAM BLOCK ──────────────────────────────────── */
+:root {
+  --exam: #b45309;
+}
+
+.block.exam {
+  background: var(--exam);
+}
+
+.dot.exam { background: var(--exam); }
+
+/* ─── EXAM SECTION IN DAY CARD ───────────────────── */
+.exam-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+}
+
+.exam-section-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 12px;
+}
