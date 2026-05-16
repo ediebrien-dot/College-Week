@@ -20,22 +20,34 @@ function buildDayCards() {
           <h3>${day}</h3>
           <label class="busy-label">
             <input type="checkbox" id="${day}-busy">
-            Busy Eve
+            Something Scheduled
           </label>
         </div>
         <div class="time-row">
           <div class="input-group">
             <label>Lecture Start</label>
-            <input type="time" id="${day}-start">
+            <select id="${day}-start">
+              <option value="">— none —</option>
+              <option value="8.45">08:45</option>
+              <option value="10.45">10:45</option>
+              <option value="13.45">13:45</option>
+              <option value="15.45">15:45</option>
+            </select>
           </div>
           <div class="input-group">
             <label>Lecture End</label>
-            <input type="time" id="${day}-end">
+            <select id="${day}-end">
+              <option value="">— none —</option>
+              <option value="10.30">10:30</option>
+              <option value="12.30">12:30</option>
+              <option value="15.30">15:30</option>
+              <option value="17.30">17:30</option>
+            </select>
           </div>
         </div>
         <div class="input-group">
           <label>Event / Plan</label>
-          <input type="text" id="${day}-event" placeholder="e.g. Night out">
+          <input type="text" id="${day}-event" placeholder="e.g. Movie night">
         </div>
       </div>
     `);
