@@ -1,5 +1,3 @@
-// script.js
-
 const days = [
   "Monday",
   "Tuesday",
@@ -10,30 +8,21 @@ const days = [
   "Sunday"
 ];
 
-const hours = [
-  "08:00",
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-  "18:00",
-  "19:00",
-  "20:00",
-  "21:00",
-  "22:00",
-  "23:00"
-];
+const times = [];
 
-const grid = document.getElementById("daysGrid");
+for (let i = 8; i <= 23; i++) {
+
+  times.push(
+    `${String(i).padStart(2,"0")}:00`
+  );
+}
+
+const daysContainer =
+  document.getElementById("daysContainer");
 
 days.forEach(day => {
 
-  grid.innerHTML += `
+  daysContainer.innerHTML += `
 
     <div class="day-card">
 
@@ -50,13 +39,15 @@ days.forEach(day => {
       </div>
 
       <div class="input-group">
-        <label>Planned Event</label>
-        <input type="text"
-        placeholder="Dinner, Society, HAIP..."
-        id="${day}-event">
+        <label>Event / Plan</label>
+        <input
+          type="text"
+          id="${day}-event"
+          placeholder="Dinner, Society, HAIP..."
+        >
       </div>
 
-      <div class="checkbox-row">
+      <div class="checkbox">
         <input type="checkbox" id="${day}-busy">
         <label>Busy Evening</label>
       </div>
@@ -71,20 +62,91 @@ document
 
 function generateWeek() {
 
-  let meals = 0;
-  let snacks = 0;
-  let gymSessions = 0;
-
-  let prepDay = "Wednesday";
-
-  let warning = "";
-
   const examMode =
     document.getElementById("examMode").checked;
 
-  const weeklySchedule = {};
+  let meals = 0;
+  let snacks = 0;
+  let gymCount = 0;
+
+  let prepDay = "Wednesday";
+
+  const warningBox =
+    document.getElementById("warningBox");
+
+  warningBox.classList.add("hidden");
+
+  const weekly = {};
 
   days.forEach(day => {
+
+    weekly[day] = {};
+
+    times.forEach(time => {
+      weekly[day][time] =
+        createBlock("Free", "free");
+    });
+
+    if (day === "Saturday") {
+
+      addBlock(weekly, day, 9, 15, "Study", "study");
+
+      if (!examMode) {
+
+        addBlock(weekly, day, 16, 18, "Gym", "gym");
+
+        gymCount++;
+      }
+
+      addBlock(
+        weekly,
+        day,
+        19,
+        21,
+        "Business/Admin",
+        "free"
+      );
+
+      meals += 1;
+      snacks += 1;
+
+      return;
+    }
+
+    if (day === "Sunday") {
+
+      addBlock(
+        weekly,
+        day,
+        10,
+        13,
+        "Meal Prep",
+        "meal"
+      );
+
+      addBlock(
+        weekly,
+        day,
+        14,
+        15,
+        "Long Walk",
+        "free"
+      );
+
+      addBlock(
+        weekly,
+        day,
+        16,
+        18,
+        "Reset + Clean",
+        "study"
+      );
+
+      meals += 1;
+      snacks += 1;
+
+      return;
+    }
 
     const start =
       document.getElementById(`${day}-start`).value;
@@ -98,24 +160,160 @@ function generateWeek() {
     const busy =
       document.getElementById(`${day}-busy`).checked;
 
-    weeklySchedule[day] = buildDay(
+    if (!start || !end) {
+
+      addBlock(
+        weekly,
+        day,
+        10,
+        13,
+        "Deep Study",
+        "study"
+      );
+
+      addBlock(
+        weekly,
+        day,
+        16,
+        18,
+        examMode ? "Study" : "Gym",
+        examMode ? "study" : "gym"
+      );
+
+      if (!examMode) {
+        gymCount++;
+      }
+
+      return;
+    }
+
+    const startHour =
+      parseInt(start.split(":")[0]);
+
+    const endHour =
+      parseInt(end.split(":")[0]);
+
+    addBlock(
+      weekly,
       day,
-      start,
-      end,
-      event,
-      busy,
-      examMode
+      startHour,
+      endHour,
+      "College",
+      "lecture"
     );
 
-    meals += weeklySchedule[day].meals;
-    snacks += weeklySchedule[day].snacks;
+    const fullDay =
+      startHour < 10 && endHour >= 16;
 
-    if (weeklySchedule[day].gym) {
-      gymSessions++;
+    const earlyDay =
+      endHour <= 13;
+
+    if (fullDay) {
+
+      meals += 1;
+      snacks += 2;
+
+      addBlock(
+        weekly,
+        day,
+        18,
+        19,
+        "Dinner",
+        "meal"
+      );
+
+      addBlock(
+        weekly,
+        day,
+        20,
+        22,
+        "Study",
+        "study"
+      );
+    }
+
+    else if (earlyDay) {
+
+      meals += 1;
+      snacks += 1;
+
+      if (!busy && !examMode) {
+
+        addBlock(
+          weekly,
+          day,
+          16,
+          18,
+          "Gym",
+          "gym"
+        );
+
+        gymCount++;
+      }
+
+      else {
+
+        addBlock(
+          weekly,
+          day,
+          16,
+          18,
+          "Study",
+          "study"
+        );
+      }
+
+      addBlock(
+        weekly,
+        day,
+        19,
+        21,
+        "Study",
+        "study"
+      );
+    }
+
+    else {
+
+      meals += 2;
+      snacks += 1;
+
+      addBlock(
+        weekly,
+        day,
+        18,
+        20,
+        "Study + Dinner",
+        "study"
+      );
+
+      if (!examMode) {
+
+        addBlock(
+          weekly,
+          day,
+          20,
+          21,
+          "Gym",
+          "gym"
+        );
+
+        gymCount++;
+      }
+    }
+
+    if (event) {
+
+      addBlock(
+        weekly,
+        day,
+        21,
+        23,
+        event,
+        "social"
+      );
     }
   });
-
-  // meal prep logic
 
   const wedBusy =
     document.getElementById("Wednesday-busy").checked;
@@ -137,9 +335,14 @@ function generateWeek() {
     }
 
     else {
+
       prepDay = "Unavailable";
-      warning =
-        "No available meal prep day this week.";
+
+      warningBox.classList.remove("hidden");
+
+      document.getElementById("warningText")
+      .textContent =
+        "No available meal prep day exists.";
     }
   }
 
@@ -150,231 +353,60 @@ function generateWeek() {
     .textContent = snacks;
 
   document.getElementById("gymCount")
-    .textContent = gymSessions;
+    .textContent = gymCount;
 
   document.getElementById("prepDay")
     .textContent = prepDay;
 
-  const warningBox =
-    document.getElementById("warningBox");
-
-  if (warning) {
-
-    warningBox.classList.remove("hidden");
-
-    document.getElementById("warningText")
-      .textContent = warning;
-
-  } else {
-    warningBox.classList.add("hidden");
-  }
-
-  renderTable(weeklySchedule, prepDay);
+  renderCalendar(weekly);
 }
 
-function buildDay(
+function addBlock(
+  weekly,
   day,
   start,
   end,
-  event,
-  busy,
-  examMode
+  text,
+  type
 ) {
 
-  let type = "free";
+  for (let i = start; i < end; i++) {
 
-  let meals = 0;
-  let snacks = 0;
+    const time =
+      `${String(i).padStart(2,"0")}:00`;
 
-  let gym = false;
-
-  const blocks = {};
-
-  if (day === "Saturday") {
-
-    blocks["08:00"] = activity("Wake + Breakfast", "meal");
-    blocks["09:00"] = activity("Study", "study");
-    blocks["10:00"] = activity("Study", "study");
-    blocks["11:00"] = activity("Study", "study");
-    blocks["12:00"] = activity("Study", "study");
-    blocks["13:00"] = activity("Study", "study");
-    blocks["14:00"] = activity("Study", "study");
-
-    if (!examMode) {
-      blocks["16:00"] = activity("Gym", "gym");
-      gym = true;
-    }
-
-    blocks["19:00"] = activity("Business/Admin", "free");
-
-    return {
-      type: "saturday",
-      meals: 1,
-      snacks: 1,
-      gym,
-      blocks
-    };
+    weekly[day][time] =
+      createBlock(text, type);
   }
-
-  if (day === "Sunday") {
-
-    blocks["09:00"] = activity("Meal Prep", "meal");
-    blocks["10:00"] = activity("Meal Prep", "meal");
-    blocks["11:00"] = activity("Clean", "free");
-    blocks["13:00"] = activity("Long Walk", "free");
-    blocks["15:00"] = activity("Reset", "study");
-    blocks["20:00"] = activity("Skincare", "free");
-
-    return {
-      type: "sunday",
-      meals: 1,
-      snacks: 1,
-      gym: false,
-      blocks
-    };
-  }
-
-  if (start && end) {
-
-    const startHour = parseInt(start.split(":")[0]);
-    const endHour = parseInt(end.split(":")[0]);
-
-    if (startHour < 10 && endHour >= 16) {
-      type = "full";
-    }
-
-    else if (endHour <= 13) {
-      type = "early";
-    }
-
-    else {
-      type = "late";
-    }
-
-    for (let h = startHour; h < endHour; h++) {
-
-      const formatted =
-        `${String(h).padStart(2,"0")}:00`;
-
-      blocks[formatted] =
-        activity("College", "lecture");
-    }
-
-    if (type === "early") {
-
-      meals += 1;
-      snacks += 1;
-
-      if (!examMode) {
-        blocks["16:00"] =
-          activity("Gym", "gym");
-
-        gym = true;
-      }
-
-      blocks["18:00"] =
-        activity("Dinner", "meal");
-
-      blocks["20:00"] =
-        activity("Study", "study");
-
-      blocks["22:00"] =
-        activity("Relax", "free");
-    }
-
-    if (type === "late") {
-
-      meals += 2;
-      snacks += 1;
-
-      blocks["18:00"] =
-        activity("Study + Dinner", "study");
-
-      if (!examMode) {
-
-        blocks["20:00"] =
-          activity("Gym", "gym");
-
-        gym = true;
-      }
-
-      else {
-
-        blocks["20:00"] =
-          activity("Extra Study", "study");
-      }
-    }
-
-    if (type === "full") {
-
-      meals += 1;
-      snacks += 2;
-
-      blocks["18:00"] =
-        activity("Clean + Meal Prep", "meal");
-
-      blocks["20:00"] =
-        activity("Study", "study");
-
-      blocks["22:00"] =
-        activity("Relax", "free");
-    }
-
-    if (busy && event) {
-
-      blocks["21:00"] =
-        activity(event, "social");
-
-      if (type === "early") {
-
-        delete blocks["16:00"];
-
-        if (!examMode) {
-          blocks["13:00"] =
-            activity("Gym", "gym");
-        }
-      }
-    }
-  }
-
-  return {
-    type,
-    meals,
-    snacks,
-    gym,
-    blocks
-  };
 }
 
-function renderTable(schedule, prepDay) {
+function createBlock(text, type) {
+
+  return `
+    <div class="block ${type}">
+      ${text}
+    </div>
+  `;
+}
+
+function renderCalendar(weekly) {
 
   const body =
-    document.getElementById("scheduleBody");
+    document.getElementById("calendarBody");
 
   body.innerHTML = "";
 
-  hours.forEach(hour => {
+  times.forEach(time => {
 
-    let row = `<tr><td>${hour}</td>`;
+    let row = `<tr><td>${time}</td>`;
 
     days.forEach(day => {
 
-      let content = "";
-
-      if (
-        schedule[day] &&
-        schedule[day].blocks[hour]
-      ) {
-        content =
-          schedule[day].blocks[hour];
-      }
-
-      else {
-        content =
-          activity("Free", "free");
-      }
-
-      row += `<td>${content}</td>`;
+      row += `
+        <td>
+          ${weekly[day][time]}
+        </td>
+      `;
     });
 
     row += "</tr>";
@@ -383,11 +415,4 @@ function renderTable(schedule, prepDay) {
   });
 }
 
-function activity(name, type) {
-
-  return `
-    <div class="activity ${type}">
-      ${name}
-    </div>
-  `;
-}
+generateWeek();
