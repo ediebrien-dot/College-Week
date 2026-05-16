@@ -35,7 +35,7 @@ function buildDayCards() {
         </div>
         <div class="input-group">
           <label>Event / Plan</label>
-          <input type="text" id="${day}-event" placeholder="e.g. Movie night">
+          <input type="text" id="${day}-event" placeholder="e.g. Night out">
         </div>
       </div>
     `);
