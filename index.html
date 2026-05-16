@@ -1,1 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Week</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="logo-mark">CW</div>
+        <div>
+          <h1>College Week</h1>
+          <p class="subtitle">Smart weekly planner</p>
+        </div>
+      </div>
+
+      <div class="exam-toggle-row">
+        <div class="toggle-label">
+          <span class="toggle-icon">🎯</span>
+          <span>Exam Mode</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="examMode">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button id="generateBtn">
+        <span class="btn-icon">⚡</span>
+        Generate My Week
+      </button>
+
+      <div class="stats-grid">
+        <div class="stat-card meal-stat">
+          <div class="stat-icon">🍽</div>
+          <div class="stat-value" id="mealCount">—</div>
+          <div class="stat-label">Meals</div>
+        </div>
+        <div class="stat-card snack-stat">
+          <div class="stat-icon">🍎</div>
+          <div class="stat-value" id="snackCount">—</div>
+          <div class="stat-label">Snacks</div>
+        </div>
+        <div class="stat-card gym-stat">
+          <div class="stat-icon">💪</div>
+          <div class="stat-value" id="gymCount">—</div>
+          <div class="stat-label">Gym</div>
+        </div>
+        <div class="stat-card prep-stat">
+          <div class="stat-icon">📦</div>
+          <div class="stat-value stat-sm" id="prepDay">—</div>
+          <div class="stat-label">Prep Day</div>
+        </div>
+      </div>
+
+      <div class="warning hidden" id="warningBox">
+        <span class="warn-icon">⚠️</span>
+        <p id="warningText"></p>
+      </div>
+
+      <div class="legend">
+        <div class="legend-title">Legend</div>
+        <div class="legend-items">
+          <div class="legend-item"><span class="dot lecture"></span>College</div>
+          <div class="legend-item"><span class="dot study"></span>Study</div>
+          <div class="legend-item"><span class="dot gym"></span>Gym</div>
+          <div class="legend-item"><span class="dot meal"></span>Meal</div>
+          <div class="legend-item"><span class="dot social"></span>Social</div>
+          <div class="legend-item"><span class="dot free"></span>Free</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <div class="main-header">
+        <h2>Weekly Inputs</h2>
+        <p class="main-subtitle">Fill in your schedule details below, then hit Generate.</p>
+      </div>
+
+      <div class="days-container">
+        <!-- Day cards injected by JS -->
+      </div>
+
+      <div class="timetable-section">
+        <div class="timetable-header">
+          <h2>Generated Timetable</h2>
+          <div class="empty-state" id="emptyState">Hit "Generate My Week" to see your schedule.</div>
+        </div>
+        <div class="calendar-wrapper hidden" id="calendarWrapper">
+          <table>
+            <thead>
+              <tr>
+                <th class="time-col">Time</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+              </tr>
+            </thead>
+            <tbody id="calendarBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
