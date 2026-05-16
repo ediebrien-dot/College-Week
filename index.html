@@ -1,19 +1,117 @@
+<!-- index.html -->
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <title>College Week Planner</title>
 
   <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-  <h1>College Week Planner</h1>
+  <div class="background-glow"></div>
 
-  <button onclick="testButton()">
-    Click Me
-  </button>
+  <div class="container">
+
+    <header class="hero">
+      <div>
+        <h1>College Week Planner</h1>
+        <p>
+          Auto-generate your ideal week based on lectures,
+          study priorities, meal prep, gym, social plans,
+          and exam mode.
+        </p>
+      </div>
+
+      <div class="hero-controls">
+        <label class="toggle">
+          <input type="checkbox" id="examMode">
+          <span>Exam Mode</span>
+        </label>
+
+        <button id="generateBtn">
+          Generate Week
+        </button>
+      </div>
+    </header>
+
+    <section class="card">
+
+      <div class="section-title">
+        Weekly Inputs
+      </div>
+
+      <div class="days-grid" id="daysGrid"></div>
+
+    </section>
+
+    <section class="summary-grid">
+
+      <div class="summary-card">
+        <h3>Meals Needed</h3>
+        <div class="summary-number" id="mealCount">0</div>
+      </div>
+
+      <div class="summary-card">
+        <h3>Snacks Needed</h3>
+        <div class="summary-number" id="snackCount">0</div>
+      </div>
+
+      <div class="summary-card">
+        <h3>Gym Sessions</h3>
+        <div class="summary-number" id="gymCount">0</div>
+      </div>
+
+      <div class="summary-card">
+        <h3>Meal Prep Day</h3>
+        <div class="summary-number small" id="prepDay">-</div>
+      </div>
+
+    </section>
+
+    <section class="card warning-card hidden" id="warningBox">
+      <strong>Warning:</strong>
+      <span id="warningText"></span>
+    </section>
+
+    <section class="card">
+
+      <div class="section-title">
+        Weekly Timetable
+      </div>
+
+      <div class="table-wrapper">
+
+        <table id="scheduleTable">
+
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Monday</th>
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>
+              <th>Friday</th>
+              <th>Saturday</th>
+              <th>Sunday</th>
+            </tr>
+          </thead>
+
+          <tbody id="scheduleBody"></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </div>
 
   <script src="script.js"></script>
 
