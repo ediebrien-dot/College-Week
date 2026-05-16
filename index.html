@@ -1,115 +1,128 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>College Week Planner</title>
 
   <link rel="stylesheet" href="style.css">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
 
-  <div class="background-glow"></div>
+  <div class="app">
 
-  <div class="container">
+    <aside class="sidebar">
 
-    <header class="hero">
-      <div>
-        <h1>College Week Planner</h1>
-        <p>
-          Auto-generate your ideal week based on lectures,
-          study priorities, meal prep, gym, social plans,
-          and exam mode.
-        </p>
-      </div>
+      <h1>College Week</h1>
 
-      <div class="hero-controls">
-        <label class="toggle">
+      <p class="subtitle">
+        Intelligent weekly planner
+      </p>
+
+      <div class="toggle-box">
+
+        <label class="switch">
+
           <input type="checkbox" id="examMode">
-          <span>Exam Mode</span>
+
+          <span class="slider"></span>
+
         </label>
 
-        <button id="generateBtn">
-          Generate Week
-        </button>
-      </div>
-    </header>
-
-    <section class="card">
-
-      <div class="section-title">
-        Weekly Inputs
-      </div>
-
-      <div class="days-grid" id="daysGrid"></div>
-
-    </section>
-
-    <section class="summary-grid">
-
-      <div class="summary-card">
-        <h3>Meals Needed</h3>
-        <div class="summary-number" id="mealCount">0</div>
-      </div>
-
-      <div class="summary-card">
-        <h3>Snacks Needed</h3>
-        <div class="summary-number" id="snackCount">0</div>
-      </div>
-
-      <div class="summary-card">
-        <h3>Gym Sessions</h3>
-        <div class="summary-number" id="gymCount">0</div>
-      </div>
-
-      <div class="summary-card">
-        <h3>Meal Prep Day</h3>
-        <div class="summary-number small" id="prepDay">-</div>
-      </div>
-
-    </section>
-
-    <section class="card warning-card hidden" id="warningBox">
-      <strong>Warning:</strong>
-      <span id="warningText"></span>
-    </section>
-
-    <section class="card">
-
-      <div class="section-title">
-        Weekly Timetable
-      </div>
-
-      <div class="table-wrapper">
-
-        <table id="scheduleTable">
-
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Monday</th>
-              <th>Tuesday</th>
-              <th>Wednesday</th>
-              <th>Thursday</th>
-              <th>Friday</th>
-              <th>Saturday</th>
-              <th>Sunday</th>
-            </tr>
-          </thead>
-
-          <tbody id="scheduleBody"></tbody>
-
-        </table>
+        <span>Exam Mode</span>
 
       </div>
 
-    </section>
+      <button id="generateBtn">
+        Generate Week
+      </button>
+
+      <div class="summary">
+
+        <div class="summary-card">
+          <h3>Meals</h3>
+          <p id="mealCount">0</p>
+        </div>
+
+        <div class="summary-card">
+          <h3>Snacks</h3>
+          <p id="snackCount">0</p>
+        </div>
+
+        <div class="summary-card">
+          <h3>Gym</h3>
+          <p id="gymCount">0</p>
+        </div>
+
+        <div class="summary-card">
+          <h3>Prep Day</h3>
+          <p id="prepDay">-</p>
+        </div>
+
+      </div>
+
+      <div class="warning hidden" id="warningBox">
+        <strong>Warning</strong>
+        <p id="warningText"></p>
+      </div>
+
+    </aside>
+
+    <main class="main-content">
+
+      <section class="inputs-section">
+
+        <div class="section-header">
+          <h2>Weekly Inputs</h2>
+        </div>
+
+        <div class="days-container" id="daysContainer"></div>
+
+      </section>
+
+      <section class="calendar-section">
+
+        <div class="section-header">
+          <h2>Generated Timetable</h2>
+        </div>
+
+        <div class="calendar-wrapper">
+
+          <table id="calendar">
+
+            <thead>
+
+              <tr>
+                <th>Time</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+              </tr>
+
+            </thead>
+
+            <tbody id="calendarBody"></tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+    </main>
 
   </div>
 
